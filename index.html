@@ -1,0 +1,2294 @@
+```html
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WeatherPro — Tempo em Tempo Real</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet">
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    color: #0f172a;
+    overflow-x: hidden;
+
+    background:
+        radial-gradient(
+            circle at 10% 5%,
+            rgba(59,130,246,.35),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 15%,
+            rgba(14,165,233,.25),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #dbeafe 0%,
+            #eff6ff 45%,
+            #f8fafc 100%
+        );
+
+    padding: 25px 20px;
+}
+
+
+/* =========================================================
+   FUNDO DECORATIVO
+========================================================= */
+
+body::before {
+    content: "";
+    position: fixed;
+
+    width: 500px;
+    height: 500px;
+
+    left: -250px;
+    bottom: -250px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(6,182,212,.16),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+body::after {
+    content: "";
+
+    position: fixed;
+
+    width: 400px;
+    height: 400px;
+
+    right: -200px;
+    top: 40%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(99,102,241,.12),
+            transparent 70%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.app-container {
+    width: 100%;
+    max-width: 1250px;
+    margin: auto;
+    position: relative;
+    z-index: 2;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 28px;
+    gap: 25px;
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.brand-icon {
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+
+    font-size: 25px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #06b6d4
+        );
+
+    box-shadow:
+        0 14px 30px rgba(37,99,235,.30);
+
+    animation: logoFloat 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+.brand h1 {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.brand p {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   PESQUISA
+========================================================= */
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    width: 370px;
+
+    padding: 7px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,.72);
+
+    border:
+        1px solid rgba(255,255,255,.9);
+
+    box-shadow:
+        0 15px 40px rgba(15,23,42,.09);
+
+    backdrop-filter: blur(20px);
+
+    transition: .3s;
+}
+
+.search-wrapper:focus-within {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 20px 45px rgba(37,99,235,.16);
+}
+
+.search-wrapper i {
+    margin-left: 12px;
+    color: #94a3b8;
+}
+
+#city-input {
+    flex: 1;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    padding: 12px 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    color: #0f172a;
+}
+
+#city-input::placeholder {
+    color: #94a3b8;
+}
+
+#search-button {
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 15px;
+
+    color: white;
+
+    cursor: pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #06b6d4
+        );
+
+    box-shadow:
+        0 8px 20px rgba(37,99,235,.25);
+
+    transition: .25s;
+}
+
+#search-button:hover {
+    transform: scale(1.06);
+}
+
+#search-button:active {
+    transform: scale(.95);
+}
+
+
+/* =========================================================
+   MENSAGENS
+========================================================= */
+
+#message-area {
+    margin-bottom: 18px;
+}
+
+.error-message,
+.loading-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 14px 18px;
+
+    border-radius: 16px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.error-message {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.loading-message {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.5fr)
+        minmax(330px, .9fr);
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card {
+    position: relative;
+
+    background:
+        rgba(255,255,255,.78);
+
+    border:
+        1px solid rgba(255,255,255,.95);
+
+    border-radius: 27px;
+
+    padding: 24px;
+
+    margin-bottom: 22px;
+
+    box-shadow:
+        0 20px 55px rgba(15,23,42,.08);
+
+    backdrop-filter: blur(22px);
+
+    overflow: hidden;
+
+    transition:
+        transform .3s,
+        box-shadow .3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 25px 65px rgba(15,23,42,.11);
+}
+
+
+/* =========================================================
+   HERO WEATHER
+========================================================= */
+
+.hero-card {
+    min-height: 500px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+}
+
+
+/* círculos decorativos */
+
+.hero-card .orb-one {
+    position: absolute;
+
+    width: 350px;
+    height: 350px;
+
+    border-radius: 50%;
+
+    top: -200px;
+    right: -120px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(59,130,246,.18),
+            transparent 70%
+        );
+}
+
+.hero-card .orb-two {
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    border-radius: 50%;
+
+    bottom: -190px;
+    left: -120px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(6,182,212,.14),
+            transparent 70%
+        );
+}
+
+
+/* =========================================================
+   LOCAL
+========================================================= */
+
+.location-title {
+    position: relative;
+    z-index: 3;
+}
+
+.location-title h2 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+}
+
+.location-title p {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+
+    margin-top: 8px;
+
+    color: #64748b;
+    font-size: 12px;
+}
+
+.location-title p i {
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   ÍCONE DO TEMPO
+========================================================= */
+
+.weather-main {
+    position: relative;
+    z-index: 3;
+
+    margin: 20px 0;
+}
+
+.main-icon {
+    width: 155px;
+    height: 155px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.95),
+            rgba(219,234,254,.75)
+        );
+
+    box-shadow:
+        0 20px 50px rgba(37,99,235,.13);
+
+    font-size: 78px;
+
+    animation:
+        weatherFloat 4s ease-in-out infinite;
+}
+
+@keyframes weatherFloat {
+
+    0%,100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-8px) rotate(2deg);
+    }
+}
+
+
+/* =========================================================
+   TEMPERATURA
+========================================================= */
+
+.temperature {
+    position: relative;
+    z-index: 3;
+
+    font-size: 82px;
+
+    font-weight: 800;
+
+    letter-spacing: -7px;
+
+    line-height: 1;
+}
+
+.temperature .degree {
+    font-size: 28px;
+
+    color: #2563eb;
+
+    letter-spacing: 0;
+
+    vertical-align: top;
+
+    margin-left: 5px;
+}
+
+
+/* =========================================================
+   DESCRIÇÃO
+========================================================= */
+
+.weather-description {
+    position: relative;
+    z-index: 3;
+
+    margin-top: 12px;
+
+    font-size: 14px;
+
+    color: #475569;
+
+    font-weight: 600;
+
+    text-transform: capitalize;
+}
+
+
+/* =========================================================
+   ALERTA
+========================================================= */
+
+.weather-alert {
+    position: relative;
+    z-index: 3;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 15px;
+
+    padding: 10px 18px;
+
+    border-radius: 30px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+.status-heat {
+    color: #92400e;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fef3c7,
+            #fde68a
+        );
+
+    border: 1px solid #fcd34d;
+}
+
+.status-normal {
+    color: #334155;
+
+    background: #f1f5f9;
+
+    border: 1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+   QUICK INFO
+========================================================= */
+
+.quick-info {
+    position: relative;
+    z-index: 3;
+
+    display: flex;
+
+    gap: 25px;
+
+    margin-top: 22px;
+
+    color: #64748b;
+
+    font-size: 11px;
+}
+
+.quick-info span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.quick-info i {
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   TÍTULOS
+========================================================= */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.section-title h3 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.section-title h3 i {
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   PREVISÃO DIÁRIA
+========================================================= */
+
+.days-list {
+    display: flex;
+    gap: 13px;
+
+    overflow-x: auto;
+
+    padding: 5px 2px 12px;
+
+    scrollbar-width: thin;
+}
+
+.day-card {
+    min-width: 105px;
+
+    padding: 18px 13px;
+
+    text-align: center;
+
+    border-radius: 19px;
+
+    cursor: pointer;
+
+    background:
+        rgba(248,250,252,.9);
+
+    border: 2px solid transparent;
+
+    transition: .3s;
+}
+
+.day-card:hover {
+    transform: translateY(-5px);
+
+    background: white;
+
+    box-shadow:
+        0 12px 25px rgba(15,23,42,.08);
+}
+
+.day-card strong {
+    display: block;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    margin-bottom: 10px;
+}
+
+.day-card small {
+    color: #2563eb;
+
+    font-size: 18px;
+
+    font-weight: 800;
+}
+
+.day-card.active {
+    border-color: transparent;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #06b6d4
+        );
+
+    box-shadow:
+        0 15px 30px rgba(37,99,235,.23);
+}
+
+.day-card.active strong,
+.day-card.active small {
+    color: white;
+}
+
+
+/* =========================================================
+   DETALHES
+========================================================= */
+
+.details-card {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 10px;
+}
+
+.detail-box {
+    padding: 18px 8px;
+
+    text-align: center;
+
+    border-radius: 19px;
+
+    background:
+        rgba(248,250,252,.9);
+
+    transition: .3s;
+}
+
+.detail-box:hover {
+    transform: translateY(-4px);
+
+    background: #eff6ff;
+}
+
+.detail-box span {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    font-weight: 600;
+}
+
+.detail-box span i {
+    color: #2563eb;
+
+    font-size: 18px;
+}
+
+.detail-box strong {
+    display: block;
+
+    margin-top: 9px;
+
+    font-size: 17px;
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   GRÁFICO
+========================================================= */
+
+.chart-card {
+    min-height: 370px;
+}
+
+.canvas-wrapper {
+    position: relative;
+
+    height: 285px;
+}
+
+
+/* =========================================================
+   INFO EXTRA
+========================================================= */
+
+.extra-weather {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap: 12px;
+
+    margin-top: 15px;
+}
+
+.extra-box {
+    padding: 16px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc,
+            #eff6ff
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.extra-box .extra-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 12px;
+
+    color: #2563eb;
+
+    background: #dbeafe;
+}
+
+.extra-box small {
+    display: block;
+
+    color: #64748b;
+
+    font-size: 9px;
+}
+
+.extra-box strong {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media(max-width:950px) {
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .side-panel {
+        display: grid;
+
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 20px;
+    }
+
+    .side-panel .card {
+        margin-bottom: 0;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:650px) {
+
+    body {
+        padding: 15px 10px;
+    }
+
+    .top-header {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .brand {
+        justify-content: center;
+    }
+
+    .search-wrapper {
+        width: 100%;
+    }
+
+    .dashboard-grid {
+        display: block;
+    }
+
+    .side-panel {
+        display: block;
+    }
+
+    .side-panel .card {
+        margin-bottom: 18px;
+    }
+
+    .hero-card {
+        min-height: 470px;
+
+        padding: 25px 15px;
+    }
+
+    .location-title h2 {
+        font-size: 29px;
+    }
+
+    .main-icon {
+        width: 125px;
+        height: 125px;
+
+        font-size: 62px;
+    }
+
+    .temperature {
+        font-size: 64px;
+    }
+
+    .quick-info {
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .details-card {
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+    .canvas-wrapper {
+        height: 245px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE PEQUENO
+========================================================= */
+
+@media(max-width:400px) {
+
+    .brand h1 {
+        font-size: 21px;
+    }
+
+    .brand-icon {
+        width: 47px;
+        height: 47px;
+        font-size: 21px;
+    }
+
+    .temperature {
+        font-size: 55px;
+    }
+
+    .main-icon {
+        width: 110px;
+        height: 110px;
+        font-size: 52px;
+    }
+
+    .details-card {
+        gap: 5px;
+        padding: 13px;
+    }
+
+    .detail-box strong {
+        font-size: 14px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div class="app-container">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="top-header">
+
+
+        <div class="brand">
+
+            <div class="brand-icon">
+
+                <i class="fas fa-cloud-sun"></i>
+
+            </div>
+
+
+            <div>
+
+                <h1>WeatherPro</h1>
+
+                <p>Previsão do tempo inteligente</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="search-wrapper">
+
+            <i class="fas fa-location-dot"></i>
+
+            <input
+                type="text"
+                id="city-input"
+                placeholder="Pesquisar cidade..."
+                autocomplete="off"
+            >
+
+            <button
+                id="search-button"
+                title="Pesquisar"
+            >
+
+                <i class="fas fa-search"></i>
+
+            </button>
+
+        </div>
+
+
+    </header>
+
+
+    <!-- =====================================================
+         MENSAGEM
+    ====================================================== -->
+
+    <div id="message-area"></div>
+
+
+    <!-- =====================================================
+         DASHBOARD
+    ====================================================== -->
+
+    <div
+        id="weather-results"
+        class="dashboard-grid"
+        style="display:none;"
+    >
+
+
+        <!-- =================================================
+             PAINEL PRINCIPAL
+        ================================================== -->
+
+        <section class="main-panel">
+
+
+            <!-- HERO -->
+
+            <div class="card hero-card">
+
+
+                <div class="orb-one"></div>
+
+                <div class="orb-two"></div>
+
+
+                <div class="location-title">
+
+                    <h2 id="city-name">
+                        --
+                    </h2>
+
+
+                    <p>
+
+                        <i class="fas fa-location-dot"></i>
+
+                        <span id="current-date">
+                            --
+                        </span>
+
+                    </p>
+
+                </div>
+
+
+                <div class="weather-main">
+
+
+                    <div
+                        id="main-weather-icon"
+                        class="main-icon"
+                    >
+
+                        <i
+                            class="fas fa-cloud-sun"
+                            style="color:#64748b"
+                        ></i>
+
+                    </div>
+
+
+                    <div class="temperature">
+
+                        <span id="current-temp">
+                            --
+                        </span>
+
+                        <span class="degree">
+                            °C
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="weather-description"
+                        class="weather-description"
+                    >
+                        --
+                    </div>
+
+
+                </div>
+
+
+                <div
+                    id="weather-alert"
+                    class="weather-alert"
+                >
+                    Carregando...
+                </div>
+
+
+                <div class="quick-info">
+
+                    <span>
+
+                        <i class="fas fa-temperature-half"></i>
+
+                        Sensação:
+                        <b id="feels-val">--</b>
+
+                    </span>
+
+
+                    <span>
+
+                        <i class="fas fa-wind"></i>
+
+                        Vento:
+                        <b id="wind-quick">--</b>
+
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 PRÓXIMOS DIAS
+            ================================================== -->
+
+            <div class="card">
+
+
+                <div class="section-title">
+
+                    <h3>
+
+                        <i class="fas fa-calendar-days"></i>
+
+                        Previsão dos próximos dias
+
+                    </h3>
+
+                </div>
+
+
+                <div
+                    class="days-list"
+                    id="forecast-list"
+                ></div>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             LATERAL
+        ================================================== -->
+
+        <section class="side-panel">
+
+
+            <!-- DETALHES -->
+
+            <div class="card">
+
+
+                <div class="section-title">
+
+                    <h3>
+
+                        <i class="fas fa-chart-simple"></i>
+
+                        Condições atuais
+
+                    </h3>
+
+                </div>
+
+
+                <div class="details-card">
+
+
+                    <div class="detail-box">
+
+                        <span>
+
+                            <i class="fas fa-droplet"></i>
+
+                            Humidade
+
+                        </span>
+
+
+                        <strong id="hum-val">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+
+                            <i class="fas fa-wind"></i>
+
+                            Vento
+
+                        </span>
+
+
+                        <strong id="wind-val">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-box">
+
+                        <span>
+
+                            <i class="fas fa-temperature-high"></i>
+
+                            Máxima
+
+                        </span>
+
+
+                        <strong id="max-val">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- INFORMAÇÕES EXTRA -->
+
+                <div class="extra-weather">
+
+
+                    <div class="extra-box">
+
+                        <div class="extra-icon">
+
+                            <i class="fas fa-sun"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <small>
+                                Condição
+                            </small>
+
+                            <strong id="condition-val">
+                                --
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="extra-box">
+
+                        <div class="extra-icon">
+
+                            <i class="fas fa-clock"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <small>
+                                Atualização
+                            </small>
+
+                            <strong>
+                                Agora
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- GRÁFICO -->
+
+            <div class="card chart-card">
+
+
+                <div class="section-title">
+
+                    <h3>
+
+                        <i class="fas fa-chart-line"></i>
+
+                        Temperatura por hora
+
+                    </h3>
+
+                </div>
+
+
+                <div class="canvas-wrapper">
+
+                    <canvas id="tempChart"></canvas>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+$(document).ready(function() {
+
+
+    /* =====================================================
+       API
+    ====================================================== */
+
+    const API_KEY =
+        "0b5c502af8c53ab958244d2aec1c3236";
+
+
+    const API_URL =
+        "https://api.openweathermap.org/data/2.5/forecast";
+
+
+    let weatherData = {};
+
+    let chartInstance = null;
+
+
+
+    /* =====================================================
+       PESQUISA
+    ====================================================== */
+
+    function fetchWeather() {
+
+
+        const city =
+            $('#city-input')
+            .val()
+            .trim();
+
+
+        if (!city) {
+
+
+            $('#message-area').html(`
+
+                <div class="error-message">
+
+                    <i class="fas fa-circle-exclamation"></i>
+
+                    Digite o nome de uma cidade.
+
+                </div>
+
+            `);
+
+            return;
+
+        }
+
+
+        $('#message-area').html(`
+
+            <div class="loading-message">
+
+                <i class="fas fa-spinner fa-spin"></i>
+
+                A procurar o clima de ${city}...
+
+            </div>
+
+        `);
+
+
+        $.ajax({
+
+            url: API_URL,
+
+            data: {
+
+                q: city,
+
+                appid: API_KEY,
+
+                mode: 'xml',
+
+                units: 'metric'
+
+            },
+
+            dataType: 'xml',
+
+
+            success: function(xml) {
+
+                $('#message-area').empty();
+
+                processXML(xml);
+
+                $('#weather-results')
+                    .fadeIn(450);
+
+            },
+
+
+            error: function(xhr) {
+
+                $('#weather-results')
+                    .hide();
+
+
+                let message =
+                    "Não foi possível obter os dados do clima.";
+
+
+                if (xhr.status === 404) {
+
+                    message =
+                        "Cidade não encontrada. Verifique o nome e tente novamente.";
+
+                }
+
+
+                $('#message-area').html(`
+
+                    <div class="error-message">
+
+                        <i class="fas fa-circle-exclamation"></i>
+
+                        ${message}
+
+                    </div>
+
+                `);
+
+            }
+
+        });
+
+    }
+
+
+
+    /* =====================================================
+       PROCESSAR XML
+    ====================================================== */
+
+    function processXML(xml) {
+
+
+        const $xml = $(xml);
+
+
+        weatherData = {};
+
+
+        const cityName =
+            $xml
+            .find('location name')
+            .first()
+            .text();
+
+
+        $('#city-name')
+            .text(cityName);
+
+
+        $xml.find('time').each(function() {
+
+
+            const time =
+                $(this).attr('from');
+
+
+            if (!time) return;
+
+
+            const parts =
+                time.split('T');
+
+
+            const date =
+                parts[0];
+
+
+            const hour =
+                parts[1].substring(0,5);
+
+
+            if (!weatherData[date]) {
+
+
+                weatherData[date] = {
+
+                    dateLabel:
+                        formatDate(date),
+
+                    hours: [],
+
+                    temps: [],
+
+                    desc: [],
+
+                    humidity:
+                        $(this)
+                        .find('humidity')
+                        .attr('value'),
+
+                    wind:
+                        $(this)
+                        .find('windSpeed')
+                        .attr('mps'),
+
+                    feels:
+                        $(this)
+                        .find('temperature')
+                        .attr('value')
+
+                };
+
+            }
+
+
+            const temp =
+                parseFloat(
+
+                    $(this)
+                    .find('temperature')
+                    .attr('value')
+
+                );
+
+
+            const description =
+                $(this)
+                .find('symbol')
+                .attr('name')
+                ||
+                "Sem informação";
+
+
+            weatherData[date]
+                .hours
+                .push(hour);
+
+
+            weatherData[date]
+                .temps
+                .push(temp);
+
+
+            weatherData[date]
+                .desc
+                .push(description);
+
+
+        });
+
+
+        renderDays();
+
+
+        const dates =
+            Object.keys(weatherData);
+
+
+        if (dates.length) {
+
+            updateUI(dates[0]);
+
+        }
+
+    }
+
+
+
+    /* =====================================================
+       DIAS
+    ====================================================== */
+
+    function renderDays() {
+
+
+        const list =
+            $('#forecast-list');
+
+
+        list.empty();
+
+
+        $.each(
+            weatherData,
+            function(date,data) {
+
+
+                const max =
+                    Math.max(...data.temps)
+                    .toFixed(0);
+
+
+                const card = $(`
+
+                    <div
+                        class="day-card"
+                        data-date="${date}"
+                    >
+
+                        <strong>
+                            ${data.dateLabel}
+                        </strong>
+
+                        <small>
+                            ${max}°C
+                        </small>
+
+                    </div>
+
+                `);
+
+
+                card.on('click',function() {
+
+
+                    $('.day-card')
+                        .removeClass('active');
+
+
+                    $(this)
+                        .addClass('active');
+
+
+                    updateUI(date);
+
+                });
+
+
+                list.append(card);
+
+            }
+        );
+
+
+        $('.day-card')
+            .first()
+            .addClass('active');
+
+    }
+
+
+
+    /* =====================================================
+       ATUALIZAR
+    ====================================================== */
+
+    function updateUI(date) {
+
+
+        const data =
+            weatherData[date];
+
+
+        if (!data) return;
+
+
+        const max =
+            Math.max(...data.temps)
+            .toFixed(0);
+
+
+        const current =
+            data.temps[0]
+            .toFixed(0);
+
+
+        const description =
+            data.desc[0]
+            ||
+            "Sem informação";
+
+
+        $('#current-temp')
+            .text(current);
+
+
+        $('#max-val')
+            .text(max + "°C");
+
+
+        $('#hum-val')
+            .text(
+
+                data.humidity
+                ?
+                data.humidity + "%"
+                :
+                "--"
+
+            );
+
+
+        $('#wind-val')
+            .text(
+
+                data.wind
+                ?
+                data.wind + " m/s"
+                :
+                "--"
+
+            );
+
+
+        $('#wind-quick')
+            .text(
+
+                data.wind
+                ?
+                data.wind + " m/s"
+                :
+                "--"
+
+            );
+
+
+        $('#feels-val')
+            .text(current + "°C");
+
+
+        $('#condition-val')
+            .text(description);
+
+
+        $('#weather-description')
+            .text(description);
+
+
+        $('#current-date')
+            .text(
+                "Previsão para " +
+                data.dateLabel
+            );
+
+
+        /* =================================================
+           ÍCONE
+        ================================================== */
+
+        const icon =
+            $('#main-weather-icon')
+            .empty();
+
+
+        const desc =
+            description.toLowerCase();
+
+
+        let iconHTML =
+            '<i class="fas fa-cloud-sun" style="color:#64748b"></i>';
+
+
+        if (
+
+            desc.includes('rain') ||
+            desc.includes('chuva') ||
+            desc.includes('drizzle')
+
+        ) {
+
+            iconHTML =
+                '<i class="fas fa-cloud-rain" style="color:#3b82f6"></i>';
+
+        }
+
+        else if (
+
+            desc.includes('clear') ||
+            desc.includes('sky') ||
+            desc.includes('sun')
+
+        ) {
+
+            iconHTML =
+                '<i class="fas fa-sun" style="color:#f59e0b"></i>';
+
+        }
+
+        else if (
+
+            desc.includes('cloud') ||
+            desc.includes('overcast')
+
+        ) {
+
+            iconHTML =
+                '<i class="fas fa-cloud" style="color:#64748b"></i>';
+
+        }
+
+        else if (
+
+            desc.includes('thunder')
+
+        ) {
+
+            iconHTML =
+                '<i class="fas fa-cloud-bolt" style="color:#8b5cf6"></i>';
+
+        }
+
+        else if (
+
+            desc.includes('snow')
+
+        ) {
+
+            iconHTML =
+                '<i class="fas fa-snowflake" style="color:#38bdf8"></i>';
+
+        }
+
+
+        icon.append(iconHTML);
+
+
+        /* =================================================
+           ALERTA
+        ================================================== */
+
+        const alert =
+            $('#weather-alert')
+            .removeClass(
+                'status-heat status-normal'
+            );
+
+
+        if (max >= 28) {
+
+            alert
+                .addClass('status-heat')
+                .html(`
+
+                    <i class="fas fa-fire"></i>
+
+                    Sol e calor intenso
+
+                `);
+
+        }
+
+        else {
+
+            alert
+                .addClass('status-normal')
+                .html(`
+
+                    <i class="fas fa-cloud-sun"></i>
+
+                    ${description}
+
+                `);
+
+        }
+
+
+        renderChart(data);
+
+    }
+
+
+
+    /* =====================================================
+       GRÁFICO
+    ====================================================== */
+
+    function renderChart(data) {
+
+
+        const canvas =
+            document.getElementById(
+                'tempChart'
+            );
+
+
+        if (!canvas) return;
+
+
+        if (chartInstance) {
+
+            chartInstance.destroy();
+
+        }
+
+
+        const ctx =
+            canvas.getContext('2d');
+
+
+        chartInstance =
+            new Chart(
+                ctx,
+                {
+
+                    type: 'line',
+
+
+                    data: {
+
+                        labels:
+                            data.hours,
+
+
+                        datasets: [{
+
+                            label:
+                                'Temperatura',
+
+
+                            data:
+                                data.temps,
+
+
+                            borderColor:
+                                '#2563eb',
+
+
+                            backgroundColor:
+                                'rgba(37,99,235,.09)',
+
+
+                            fill: true,
+
+
+                            tension: .45,
+
+
+                            borderWidth: 3,
+
+
+                            pointRadius: 4,
+
+
+                            pointHoverRadius: 7,
+
+
+                            pointBackgroundColor:
+                                '#2563eb'
+
+                        }]
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+
+                        interaction: {
+
+                            intersect: false,
+
+                            mode: 'index'
+
+                        },
+
+
+                        plugins: {
+
+                            legend: {
+
+                                display: false
+
+                            }
+
+                        },
+
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: false,
+
+                                border: {
+                                    display: false
+                                },
+
+                                grid: {
+
+                                    color:
+                                        'rgba(148,163,184,.13)'
+
+                                },
+
+                                ticks: {
+
+                                    color:
+                                        '#64748b',
+
+                                    font: {
+                                        size: 10
+                                    },
+
+                                    callback:
+                                        function(value) {
+
+                                            return value + '°';
+
+                                        }
+
+                                }
+
+                            },
+
+
+                            x: {
+
+                                border: {
+                                    display: false
+                                },
+
+                                grid: {
+                                    display: false
+                                },
+
+                                ticks: {
+
+                                    color:
+                                        '#64748b',
+
+                                    font: {
+                                        size: 10
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            );
+
+    }
+
+
+
+    /* =====================================================
+       DATA
+    ====================================================== */
+
+    function formatDate(dateStr) {
+
+
+        const days = [
+
+            'Dom',
+
+            'Seg',
+
+            'Ter',
+
+            'Qua',
+
+            'Qui',
+
+            'Sex',
+
+            'Sáb'
+
+        ];
+
+
+        const date =
+            new Date(
+                dateStr +
+                'T12:00:00'
+            );
+
+
+        return days[
+            date.getDay()
+        ];
+
+    }
+
+
+
+    /* =====================================================
+       EVENTOS
+    ====================================================== */
+
+    $('#search-button')
+        .on('click',function() {
+
+            fetchWeather();
+
+        });
+
+
+    $('#city-input')
+        .on('keypress',function(e) {
+
+            if (e.which === 13) {
+
+                fetchWeather();
+
+            }
+
+        });
+
+
+});
+
+</script>
+
+</body>
+</html>
+```
